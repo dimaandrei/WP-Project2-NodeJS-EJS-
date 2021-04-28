@@ -1,0 +1,17 @@
+<h1> Formular: </h1>
+<form>
+    <fieldset>
+        <legend>Informații generale:</legend><br>
+        <%# this will output the questions%>
+        <% for(var i=0; i <intrebari.length; i++) { %>
+            <label for="<%=i%>">
+                <%= intrebari[i]["intrebare"] %>
+            </label><br>
+            <% for(var j=0; j <intrebari[i]["variante"].length; j++) { %>
+                <input type="radio" id="<%=i%>" name="<%=i%>" />
+                <%= intrebari[i]["variante"][j]%> <br>
+            <% } %>
+                       
+        <% } %>
+    </fieldset>
+</form>
