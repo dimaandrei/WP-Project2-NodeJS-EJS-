@@ -5,7 +5,8 @@ const bodyParser = require('body-parser')
 const app = express();
 
 const port = 6789;
-
+const fs = require('fs');
+const { Console } = require('console');
 // directorul 'views' va conține fișierele .ejs (html + js executat la server)
 app.set('view engine', 'ejs');
 // suport pentru layout-uri - implicit fișierul care reprezintă template-ul site-ului este views/layout.ejs
@@ -24,21 +25,42 @@ app.get('/', (req, res) => res.send('Hello World'));
 
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
-	const listaIntrebari = [
-		{
-			intrebare: 'Întrebarea 1',
-			variante: ['varianta 1', 'varianta 2', 'varianta 3', 'varianta 4'],
-			corect: 0
-		},
-		//...
-	];
+
 	// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
-	res.render('chestionar', {intrebari: listaIntrebari});
+	fs.readFile('intrebari.json', (err, data) => {
+		if (err) {
+			res.send('Nu există întrebări!');
+			return;
+		}
+		res.render('chestionar', {
+			intrebari: JSON.parse(data)
+		});
+	});
 });
 
 app.post('/rezultat-chestionar', (req, res) => {
-	console.log(req.body);
-	res.send("formular: " + JSON.stringify(req.body));
+	fs.readFile('intrebari.json', (err, data) => {
+		if (err) {
+			res.send('Nu exista intrebari!');
+			return;
+		}
+		const listaIntrebari = JSON.parse(data);
+		const body = req.body;
+		const keys = Object.keys(body);
+		
+		var raspCor = 0;
+		for (var i = 0; i < keys.length; ++i) {
+			let k = keys[i];
+			if (listaIntrebari[k].corect == body[k])
+				raspCor++;
+		}
+		res.render('rezultat-chestionar', { 
+			intrebari:listaIntrebari,
+			raspunsuri_corecte: raspCor });
+	});
 });
+
+//res.send("formular: " + JSON.stringify(req.body));
+
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));

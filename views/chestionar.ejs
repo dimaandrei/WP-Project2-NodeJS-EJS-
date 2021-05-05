@@ -1,17 +1,17 @@
 <h1> Formular: </h1>
-<form>
+<form action="/rezultat-chestionar" method="post">
     <fieldset>
-        <legend>Informații generale:</legend><br>
+        <legend>Curiozitati despre fructe:</legend><br>
         <%# this will output the questions%>
         <% for(var i=0; i <intrebari.length; i++) { %>
             <label for="<%=i%>">
                 <%= intrebari[i]["intrebare"] %>
             </label><br>
-            <% for(var j=0; j <intrebari[i]["variante"].length; j++) { %>
-                <input type="radio" id="<%=i%>" name="<%=i%>" />
-                <%= intrebari[i]["variante"][j]%> <br>
-            <% } %>
-                       
+            <% for(var j=0; j <intrebari[i]["variante"].length; j++) { %>&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="radio" id="<%- i %>" name="<%- i %>" value="<%= j %>" />&nbsp;
+                <%- intrebari[i]["variante"][j]%> <br>
+            <% } %>   
         <% } %>
+        <input type="submit" value="Submit answers" >
     </fieldset>
 </form>
