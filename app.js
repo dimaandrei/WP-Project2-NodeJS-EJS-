@@ -25,7 +25,6 @@ app.get('/', (req, res) => res.send('Hello World'));
 
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
-
 	// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
 	fs.readFile('intrebari.json', (err, data) => {
 		if (err) {
@@ -64,3 +63,4 @@ app.post('/rezultat-chestionar', (req, res) => {
 
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));
+

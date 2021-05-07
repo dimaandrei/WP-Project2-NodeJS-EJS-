@@ -1,31 +1,55 @@
-
-
 <!DOCTYPE html>
 <html lang="ro-RO">
 
 <head>
     <title>Acasă</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="../app.js"></script>
+    <script>
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+            document.getElementById("main").style.marginLeft = "250px";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+            document.getElementById("main").style.marginLeft = "0";
+        }
+    </script>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 
 <body>
+
     <header>
         <h1>Lumea fructelor</h1>
-
     </header>
 
-    <nav>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <nav>
+            <hr>
+            <a href="#">Acasă</a>&nbsp;&nbsp;
+            <a href="#">About</a>
+            <hr>
+        </nav>
+    </div>
+    <aside>
+        <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+    </aside>
+    <div id="main">
+
+        <main id="continut">
+            
+            <%- body -%>
+        </main>
+
+
         <hr>
-        <a href="#" >Acasă</a>&nbsp;&nbsp;
-        <hr>
-    </nav>
-    <main id="continut">
-        <%- body -%>
-    </main>
-    <hr>
-    <footer>
-        &copy;Dima Raul Andrei. 2021 . Programare web
-    </footer>
+        <footer>
+            &copy;Dima Raul Andrei. 2021 . Programare web
+        </footer>
+    </div>
 </body>
 
 </html>
-
