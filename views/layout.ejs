@@ -30,6 +30,9 @@
             <hr>
             <a href="/">Acasă</a>
             <a href="/autentificare">Autentificare</a>
+            <a href="/creare-bd">Creare DB</a>
+            <a href="/inserare-bd">Inserare DB</a>
+            <a href="/close-conn">Close DB</a>
             <a href="#">About</a>
             <hr>
         </nav>
@@ -38,7 +41,11 @@
         <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
     </aside>
     <div id="main">
-
+        <% if(username) { %>
+            <div class="loggedIN">
+                Logat ca <%= username %>. <button><a href="/delogare">Delogare</a></button>
+            </div>
+        <% } %>
         <main id="continut">
             
             <%- body -%>

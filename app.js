@@ -7,6 +7,8 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
+
 const app = express();
 const port = 6789;
 const fs = require('fs');
@@ -16,6 +18,8 @@ const OracleDB = require('oracledb');
 app.set('view engine', 'ejs');
 // suport pentru layout-uri - implicit fișierul care reprezintă template-ul site-ului este views/layout.ejs
 app.use(cookieParser());
+app.use(session({ secret: "secret session" }));
+
 app.use(expressLayouts);
 // directorul 'public' va conține toate resursele accesibile direct de către client (e.g., fișiere css, javascript, imagini)
 app.use(express.static('public'))
@@ -35,9 +39,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
 	//console.log(req.cookies.username);
 	res.render('index', {
-		username:req.cookies.username,
-		firstname:"Gigel",
-		
+		username: req.cookies.username,
+		firstname: req.session.firstname,
+
 	});
 });
 
@@ -82,14 +86,13 @@ app.post('/rezultat-chestionar', (req, res) => {
 app.get('/autentificare', (req, res) => {
 	res.render('autentificare', {
 		title: 'Autentificare',
-		username:req.cookies.username,
-		mesajEroare:req.cookies.mesajEroare,
+		username: req.cookies.username,
+		mesajEroare: req.cookies.mesajEroare,
 	});
 });
 
 app.post('/verificare-autentificare', (req, res) => {
-	console.log(req.body);
-	//res.send("formular: " + JSON.stringify(req.body));
+	/*console.log(req.body);
 	if (req.body.username === "test" && req.body.password === "test") {
 		console.log("Corect");
 		
@@ -105,7 +108,38 @@ app.post('/verificare-autentificare', (req, res) => {
 		res.cookie('mesajEroare', "User name or password incorrect!",{ httpOnly: true});
 
 		res.redirect('/autentificare');
-	}
+	}*/
+	fs.readFile('utilizatori.json', (err, data) => {
+		if (err) {
+			res.status(404);
+			res.send('Eroare! File not found!');
+			return;
+		}
+
+		const result = JSON.parse(data).filter(u => u.username === req.body.username && u.password === req.body.password);
+
+		if (result.length > 0) {
+			req.session.username = req.body.username;
+			req.session.firstname = result[0].firstname;
+			req.session.lastname = result[0].lastname;
+			res.cookie('username', req.session.username, { httpOnly: true });
+			res.clearCookie('mesajEroare');
+			res.redirect('/');
+		}
+		else {
+			req.session.mesajEroare = 'Utilizator sau parolă greșite!';
+			res.clearCookie('username');
+			res.cookie('mesajEroare', req.session.mesajEroare, { httpOnly: true });
+			res.redirect('/autentificare');
+		}
+	});
+
+
+});
+
+app.get('/delogare', (req, res) => {
+	res.clearCookie('username');
+	res.redirect('/autentificare');
 });
 
 async function run() {
@@ -159,36 +193,74 @@ app.get('/creare-bd', (req, res) => {
 	res.redirect('/');
 });
 
+app.get('/close-conn', (req, res) => {
+	closeConn();
+	res.redirect('/');
+});
 async function insert() {
 	try {
 		sql = 'INSERT INTO produse VALUES (:1, :2, :3)';
 		binds = [
-			[1,"Castraveti", 4],
-			[2,"Rosii", 13],
-			[3,"Banane", 7],
-			[4,"Capsuni", 9],
-			[5,"Cirese", 79],
+			[1, "Castraveti", 4],
+			[2, "Rosii", 13],
+			[3, "Banane", 7],
+			[4, "Capsuni", 9],
+			[5, "Cirese", 79],
 		];
 		// For a complete list of options see the documentation.
 		options = {
 			autoCommit: true,
 			// batchErrors: true,  // continue processing even if there are data errors
-			bindDefs: [{type: oracledb.NUMBER},
-				{ type: oracledb.STRING, maxSize: 20 },
-				{ type: oracledb.NUMBER }
+			bindDefs: [{ type: oracledb.NUMBER },
+			{ type: oracledb.STRING, maxSize: 20 },
+			{ type: oracledb.NUMBER }
 			]
 		};
 		result = await connection.executeMany(sql, binds, options);
 		console.log("Number of rows inserted:", result.rowsAffected); // For a complete list of options see the documentation.
-		closeConn();
 	} catch (err) {
 		console.error(err);
 	}
 }
 app.get('/inserare-bd', (req, res) => {
 	insert();
-	
 	res.redirect('/');
+});
+
+async function select() {
+	try {
+		sql = 'SELECT * FROM produse';
+
+		binds = {};
+
+		// For a complete list of options see the documentation.
+		options = {
+			outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
+			// extendedMetaData: true,               // get extra metadata
+			// prefetchRows:     100,                // internal buffer allocation size for tuning
+			// fetchArraySize:   100                 // internal buffer allocation size for tuning
+		};
+
+		let result = await connection.execute(sql, binds, options);
+
+		console.log("Metadata: ");
+		console.dir(result.metaData, { depth: null });
+		console.log("Query results: ");
+		console.dir(result.rows, { depth: null });
+		return result;
+	} catch (err) {
+		console.error(err);
+	}
+	
+}
+
+app.get('/show-produse', (req, res) => {
+	var data=select();
+	res.render('index', {
+		username: req.cookies.username,
+		firstname: req.session.firstname,
+
+	});
 });
 
 app.get('/adaugare-cos', (req, res) => {
