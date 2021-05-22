@@ -1,4 +1,4 @@
-<% if(dbData && cart!=[]) { %>
+<% if(dbData && cart) { %>
     <fieldset>
         <legend>Produse</legend><br>
         <table class="center" style="width:75%">
@@ -22,4 +22,11 @@
             </tbody>    
         </table>
     </fieldset>
-<% } %>
+<% }else{%>
+    <% if(mesajEroare) { %>
+        <p><%= mesajEroare %></p>
+    <%} else{%>
+        <p>Coș de cumpăraturi gol!</p>
+    <%} %>
+<%} %>
+

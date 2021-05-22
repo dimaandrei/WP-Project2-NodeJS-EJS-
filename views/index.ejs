@@ -12,6 +12,11 @@
         <br>
         <a class="produse" href="/show-produse">Show produse</a>
 
+<% if(username=="ADMIN") { %>
+    <br>
+    <a  href="/admin">Admin page</a>
+<% } %>
+
 <% if(dbData) { %>
         
             <fieldset>

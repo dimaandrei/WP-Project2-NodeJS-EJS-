@@ -2,7 +2,7 @@
 process.env.ORA_SDTZ = 'UTC';
 const oracledb = require('oracledb');
 const dbConfig = require('./dbconfig.js');
-var connection;
+var connection = null;
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 	res.render('index', {
 		username: req.cookies.username,
 		firstname: req.session.firstname,
-		dbData:null,
+		dbData: null,
 	});
 });
 
@@ -110,7 +110,7 @@ app.post('/verificare-autentificare', (req, res) => {
 
 		res.redirect('/autentificare');
 	}*/
-	fs.readFile('utilizatori.json', (err, data) => {
+	fs.readFile('utilizatori2.json', (err, data) => {
 		if (err) {
 			res.status(404);
 			res.send('Eroare! File not found!');
@@ -241,7 +241,7 @@ async function select() {
 			// prefetchRows:     100,                // internal buffer allocation size for tuning
 			// fetchArraySize:   100                 // internal buffer allocation size for tuning
 		};
-		
+
 		let result = await connection.execute(sql, binds, options);
 		/*
 		console.log("Metadata: ");
@@ -257,39 +257,134 @@ async function select() {
 }
 
 app.get('/show-produse', (req, res) => {
-	select().then( function (value) {
-		//console.log(value.rows);
-		res.render('index', {
-			username: req.cookies.username,
-			firstname: req.session.firstname,
-			dbData: value.rows,
+	if (connection == null) {
+		run().then(function () {
+			insert().then(function () {
+				select().then(function (value) {
+					//console.log(value.rows);
+					res.render('index', {
+						username: req.cookies.username,
+						firstname: req.session.firstname,
+						dbData: value.rows,
+					});
+				});
+			});
 		});
-	});
-
+	}
+	else {
+		select().then(function (value) {
+			//console.log(value.rows);
+			res.render('index', {
+				username: req.cookies.username,
+				firstname: req.session.firstname,
+				dbData: value.rows,
+			});
+		});
+	}
 });
 
 app.post('/adaugare-cos', (req, res) => {
 	//var cart = req.session.cart || [];
-    //cart.push(req.body.id);
-	if(!req.session.cart)
-		req.session.cart=[]
+	//cart.push(req.body.id);
+	if (!req.session.cart)
+		req.session.cart = []
 	req.session.cart.push(req.body.id);
 	console.log(req.session.cart);
 	res.redirect('/show-produse');
 });
 
 app.get('/vizualizare-cos', (req, res) => {
-	select().then( function (value) {
-		//console.log(value.rows);
+	if (connection != null) {
+		select().then(function (value) {
+			//console.log(value.rows);
+			res.render('vizualizare-cos', {
+				title: 'Coș cumpărături',
+				username: req.cookies.username,
+				firstname: req.session.firstname,
+				dbData: value.rows,
+				cart: req.session.cart,
+				mesajEroare: null,
+			});
+		});
+	}
+	else {
 		res.render('vizualizare-cos', {
 			title: 'Coș cumpărături',
 			username: req.cookies.username,
 			firstname: req.session.firstname,
-			dbData: value.rows,
-			cart: req.session.cart,
+			dbData: null,
+			cart: null,
+			mesajEroare: "Conexiunea cu baza de date este inchisa!",
 		});
+	}
+});
+
+app.get('/about', (req, res) => {
+	res.render('about', {
+		title: 'About',
+		username: req.cookies.username,
+		firstname: req.session.firstname,
+		dbData: null,
+		cart: null,
+		mesajEroare: null,
 	});
-	
+});
+
+app.get('/admin', (req, res) => {
+	res.render('admin', {
+		title: 'Admin',
+		username: req.cookies.username,
+		firstname: req.session.firstname,
+		dbData: null,
+		cart: null,
+		mesajEroare: null,
+	});
+});
+async function adminInsert(id, data, pret) {
+	try {
+		sql = 'INSERT INTO produse VALUES (:1, :2, :3)';
+		binds = [
+			[parseInt(id), data, parseInt(pret)],
+		];
+		// For a complete list of options see the documentation.
+		options = {
+			autoCommit: true,
+			// batchErrors: true,  // continue processing even if there are data errors
+			bindDefs: [{ type: oracledb.NUMBER },
+			{ type: oracledb.STRING, maxSize: 20 },
+			{ type: oracledb.NUMBER }
+			]
+		};
+		result = await connection.executeMany(sql, binds, options);
+		console.log("Number of rows inserted:", result.rowsAffected); // For a complete list of options see the documentation.
+	} catch (err) {
+		console.error(err);
+	}
+}
+
+app.post('/admin-insert', (req, res) => {
+	if (connection != null) {
+		select().then(function (value) {
+			//console.log(value.rows.length);
+			const body = req.body;
+			const keys = Object.keys(body);
+			//console.log(keys);
+			adminInsert(value.rows.length+1,body['data'], body['pret']).then(function(){
+				res.redirect('/admin');
+			});
+		});
+	}
+	else
+	{
+		res.render('admin', {
+			title: 'Admin',
+			username: req.cookies.username,
+			firstname: req.session.firstname,
+			dbData: null,
+			cart: null,
+			mesajEroare: "Conexiunea cu DB este inchisa.",
+		});
+	}
 });
 
 //res.send("formular: " + JSON.stringify(req.body));
