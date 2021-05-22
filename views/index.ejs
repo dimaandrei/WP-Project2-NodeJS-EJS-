@@ -1,15 +1,51 @@
-
-
 <div class="stanga">
     <% if(username) { %>
         <br>
         <h2>Bine ai venit, <%= firstname %>!</h2>
-    <% } %>
+        <% } %>
 </div>
 
 <% if(!username) { %>
     <br>
     <a class="conectare" href="/autentificare">Autentificare</a>
 <% } %>
-<br>
-<a class="produse" href="/show-produse">Show produse</a>
+        <br>
+        <a class="produse" href="/show-produse">Show produse</a>
+
+<% if(dbData) { %>
+        
+            <fieldset>
+                <legend>Produse</legend><br>
+                <table class="center"  style="width:75%">
+                    <thead>
+                        <tr>
+                            <th>ID produs</th>
+                            <th>Nume produs</th>
+                            <th>Pret/kg</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%# this will output the questions%>
+                            <% for(var i=0; i <dbData.length; i++) { %>
+                                <tr>
+                                    <td>
+                                        <%= dbData[i]["ID"]%></td>
+                                    <td>
+                                        <%= dbData[i]["DATA"]%></td>
+                                    <td>
+                                        <%= dbData[i]["PRET"]%></td>
+                                    <% if(username) { %>
+                                        <td class="button">
+                                            <form action="/adaugare-cos" method="post">
+                                                <input type="hidden" name="id" value="<%= dbData[i]['ID'] %>">
+                                                <button type="submit">Adaugă în coș</button>
+                                            </form>
+                                        </td>
+                                    <% } %>
+                                </tr>
+                                
+                            <% } %>
+                    </tbody>
+                </table>
+            </fieldset>
+ <% } %>

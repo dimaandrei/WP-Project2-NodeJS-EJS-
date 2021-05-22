@@ -14,6 +14,7 @@ const port = 6789;
 const fs = require('fs');
 const { Console } = require('console');
 const OracleDB = require('oracledb');
+const { json } = require('body-parser');
 // directorul 'views' va conține fișierele .ejs (html + js executat la server)
 app.set('view engine', 'ejs');
 // suport pentru layout-uri - implicit fișierul care reprezintă template-ul site-ului este views/layout.ejs
@@ -41,7 +42,7 @@ app.get('/', (req, res) => {
 	res.render('index', {
 		username: req.cookies.username,
 		firstname: req.session.firstname,
-
+		dbData:null,
 	});
 });
 
@@ -240,37 +241,55 @@ async function select() {
 			// prefetchRows:     100,                // internal buffer allocation size for tuning
 			// fetchArraySize:   100                 // internal buffer allocation size for tuning
 		};
-
+		
 		let result = await connection.execute(sql, binds, options);
-
+		/*
 		console.log("Metadata: ");
 		console.dir(result.metaData, { depth: null });
 		console.log("Query results: ");
 		console.dir(result.rows, { depth: null });
+		*/
 		return result;
 	} catch (err) {
 		console.error(err);
 	}
-	
+
 }
 
 app.get('/show-produse', (req, res) => {
-	var data=select();
-	res.render('index', {
-		username: req.cookies.username,
-		firstname: req.session.firstname,
-
+	select().then( function (value) {
+		//console.log(value.rows);
+		res.render('index', {
+			username: req.cookies.username,
+			firstname: req.session.firstname,
+			dbData: value.rows,
+		});
 	});
+
 });
 
-app.get('/adaugare-cos', (req, res) => {
-
+app.post('/adaugare-cos', (req, res) => {
+	//var cart = req.session.cart || [];
+    //cart.push(req.body.id);
+	if(!req.session.cart)
+		req.session.cart=[]
+	req.session.cart.push(req.body.id);
+	console.log(req.session.cart);
+	res.redirect('/show-produse');
 });
 
 app.get('/vizualizare-cos', (req, res) => {
-	res.render('vizualizare-cos', {
-		title: 'Cos cumparaturi',
+	select().then( function (value) {
+		//console.log(value.rows);
+		res.render('vizualizare-cos', {
+			title: 'Coș cumpărături',
+			username: req.cookies.username,
+			firstname: req.session.firstname,
+			dbData: value.rows,
+			cart: req.session.cart,
+		});
 	});
+	
 });
 
 //res.send("formular: " + JSON.stringify(req.body));

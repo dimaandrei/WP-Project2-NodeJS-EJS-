@@ -1,4 +1,3 @@
-
 body {
     background-color: rgb(107, 130, 151);
     background-image: url("../imagini/1948221.png");
@@ -54,15 +53,72 @@ body {
     .sidenav {
         padding-top: 15px;
     }
-
     .sidenav a {
         font-size: 18px;
     }
 }
 
-header{
+header {
     text-align: center;
 }
-.autentificare p{
+
+.autentificare p {
     color: crimson;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+td  :last-child {
+    border: none;
+    
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.center thead tr {
+    background-color: #009879;
+    color: #ffffff;
+    text-align: left;
+}
+
+.center th,
+.center td {
+    padding: 12px 15px;
+}
+
+.center tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.center tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.center tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+
+.center tbody tr.active-row {
+    font-weight: bold;
+    color: #009879;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: red;
+    color: white;
+    text-align: center;
 }

@@ -1,0 +1,25 @@
+<% if(dbData && cart!=[]) { %>
+    <fieldset>
+        <legend>Produse</legend><br>
+        <table class="center" style="width:75%">
+            <thead>
+                <th>ID produs</th>
+                <th>Nume produs</th>
+                <th>Pret/kg</th>
+            </thead>
+            <tbody>
+            <%# this will output the questions%>
+                <% for(var i=0; i <cart.length; i++) { %>
+                    <tr>
+                        <td>
+                            <%= i %></td>
+                        <td>
+                            <%= dbData[cart[i]-1]["DATA"]%></td>
+                        <td>
+                            <%= dbData[cart[i]-1]["PRET"]%></td>
+                    </tr>
+                <% } %>
+            </tbody>    
+        </table>
+    </fieldset>
+<% } %>
