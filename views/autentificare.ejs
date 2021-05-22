@@ -1,4 +1,8 @@
 <div class="autentificare">
+    <% if(mesajEroare) { %>
+        <br>
+        <p> <%= mesajEroare %>!</p>
+    <% } %>
     <form action="/verificare-autentificare" method="POST">
         <label for="username" style="font-size: larger; font-weight: 700;">Utilizator</label>
         <input type="text" id="username" name="username" placeholder="Your username">

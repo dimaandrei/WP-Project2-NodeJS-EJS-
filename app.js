@@ -15,6 +15,7 @@ const OracleDB = require('oracledb');
 // directorul 'views' va conține fișierele .ejs (html + js executat la server)
 app.set('view engine', 'ejs');
 // suport pentru layout-uri - implicit fișierul care reprezintă template-ul site-ului este views/layout.ejs
+app.use(cookieParser());
 app.use(expressLayouts);
 // directorul 'public' va conține toate resursele accesibile direct de către client (e.g., fișiere css, javascript, imagini)
 app.use(express.static('public'))
@@ -22,7 +23,7 @@ app.use(express.static('public'))
 app.use(bodyParser.json());
 // utilizarea unui algoritm de deep parsing care suportă obiecte în obiecte
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+
 
 
 
@@ -32,10 +33,11 @@ app.use(cookieParser());
 //app.get('/', (req, res) => res.send('Hello World'));
 
 app.get('/', (req, res) => {
-	// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
-
+	//console.log(req.cookies.username);
 	res.render('index', {
-
+		username:req.cookies.username,
+		firstname:"Gigel",
+		
 	});
 });
 
@@ -80,6 +82,8 @@ app.post('/rezultat-chestionar', (req, res) => {
 app.get('/autentificare', (req, res) => {
 	res.render('autentificare', {
 		title: 'Autentificare',
+		username:req.cookies.username,
+		mesajEroare:req.cookies.mesajEroare,
 	});
 });
 
@@ -88,11 +92,20 @@ app.post('/verificare-autentificare', (req, res) => {
 	//res.send("formular: " + JSON.stringify(req.body));
 	if (req.body.username === "test" && req.body.password === "test") {
 		console.log("Corect");
-		req.cookies.username = req.body.username;
+		
+		res.cookie('username', req.body.username,{ httpOnly: true});
+		res.clearCookie('mesajEroare');
+		//console.log(req.cookies.username);
 		res.redirect('/');
 	}
+	else{
+		console.log("Incorect");
+		//req.cookies.mesajEroare = "User name or password incorrect!"
+		res.clearCookie('username');
+		res.cookie('mesajEroare', "User name or password incorrect!",{ httpOnly: true});
 
-
+		res.redirect('/autentificare');
+	}
 });
 
 async function run() {
@@ -102,7 +115,8 @@ async function run() {
 		connection = await oracledb.getConnection(dbConfig);
 		const stmts = [
 			'DROP TABLE produse',
-			'CREATE TABLE produse(data VARCAHR(20), pret(NUMBER))'
+			'CREATE TABLE produse(id NUMBER NOT NULL, data VARCHAR(20), pret NUMERIC(5))'//,
+			//'ALTER TABLE produse ADD(CONSTRAINT id_pk PRIMARY KEY(id))'
 		];
 		for (const s of stmts) {
 			try {
@@ -112,10 +126,22 @@ async function run() {
 					console.error(e);
 			}
 		}
-		console.log()
 	} catch (err) {
 		console.error(err);
-	} finally {
+	}
+	/*
+	finally {
+		if (connection) {
+			try {
+				await connection.close();
+			} catch (err) {
+				console.error(err);
+			}
+		}
+	}*/
+}
+async function closeConn() {
+	try {
 		if (connection) {
 			try {
 				await connection.close();
@@ -124,42 +150,45 @@ async function run() {
 			}
 		}
 	}
+	catch (err) {
+		console.error(err);
+	}
 }
 app.get('/creare-bd', (req, res) => {
 	run();
-	res.render('index', {
-		title: 'Home',
-	});
+	res.redirect('/');
 });
 
 async function insert() {
-	sql = 'INSERT INTO no_example VALUES (:1, :2)';
-	binds = [
-		["Castraveti", 4],
-		["Rosii", 13],
-		["Banane", 7],
-		["Capsuni", 9],
-		["Cirese", 79],
-	];
-	// For a complete list of options see the documentation.
-	options = {
-		autoCommit: true,
-		// batchErrors: true,  // continue processing even if there are data errors
-		bindDefs: [
-			{ type: oracledb.STRING, maxSize: 20 },
-			{ type: oracledb.NUMBER }
-		]
-	};
-
-	result = await connection.executeMany(sql, binds, options);
-
-	console.log("Number of rows inserted:", result.rowsAffected); I// For a complete list of options see the documentation.
+	try {
+		sql = 'INSERT INTO produse VALUES (:1, :2, :3)';
+		binds = [
+			[1,"Castraveti", 4],
+			[2,"Rosii", 13],
+			[3,"Banane", 7],
+			[4,"Capsuni", 9],
+			[5,"Cirese", 79],
+		];
+		// For a complete list of options see the documentation.
+		options = {
+			autoCommit: true,
+			// batchErrors: true,  // continue processing even if there are data errors
+			bindDefs: [{type: oracledb.NUMBER},
+				{ type: oracledb.STRING, maxSize: 20 },
+				{ type: oracledb.NUMBER }
+			]
+		};
+		result = await connection.executeMany(sql, binds, options);
+		console.log("Number of rows inserted:", result.rowsAffected); // For a complete list of options see the documentation.
+		closeConn();
+	} catch (err) {
+		console.error(err);
+	}
 }
 app.get('/inserare-bd', (req, res) => {
 	insert();
-	res.render('index', {
-		title: 'Home',
-	});
+	
+	res.redirect('/');
 });
 
 app.get('/adaugare-cos', (req, res) => {

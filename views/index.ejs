@@ -1,1 +1,13 @@
-<a href="/autentificare">Autentificare</a>
+
+
+<div class="stanga">
+    <% if(username) { %>
+        <br>
+        <h2>Bine ai venit, <%= firstname %>!</h2>
+    <% } %>
+</div>
+
+<% if(!username) { %>
+    <br>
+    <a class="conectare" href="/autentificare">Autentificare</a>
+<% } %>
