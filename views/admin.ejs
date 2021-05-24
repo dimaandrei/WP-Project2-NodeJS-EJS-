@@ -1,14 +1,18 @@
-<form action="/admin-insert" method="post">
-    <fieldset>
-        <legend>Detalii fructe:</legend><br>
-        <%# this will output the questions%>
-        <label for="data">Nume produs:</label>
-        <input type="text" id="data" name="data" /><br><br>
-        <label for="pret">Cost/kg produs:</label>
-        <input type="text" id="pret" name="pret" /><br><br>
-        <input type="submit" value="Submit answers" >
-    </fieldset>
-</form>
-<% if(mesajEroare) { %>
-    <p><%= mesajEroare %></p>
-<%} %>
+<div class="autentBoxes">
+    <form action="/admin-insert" method="post">
+        <fieldset>
+            <legend>Detalii fructe:</legend><br>
+            <%# this will output the questions%>
+                <label for="data">Nume produs:</label>
+                <input type="text" id="data" name="data" /><br><br>
+                <label for="pret">Cost/kg produs:</label>
+                <input type="text" id="pret" name="pret" /><br><br>
+                <input  type="submit" value="Submit answers">
+        </fieldset>
+    </form>
+    <% if(mesajEroare) { %>
+        <p>
+            <%= mesajEroare %>
+        </p>
+        <%} %>
+</div>

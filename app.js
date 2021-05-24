@@ -40,6 +40,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
 	//console.log(req.cookies.username);
 	res.render('index', {
+		title:"Acasă",
 		username: req.cookies.username,
 		firstname: req.session.firstname,
 		dbData: null,
@@ -263,6 +264,7 @@ app.get('/show-produse', (req, res) => {
 				select().then(function (value) {
 					//console.log(value.rows);
 					res.render('index', {
+						title:"Acasă",
 						username: req.cookies.username,
 						firstname: req.session.firstname,
 						dbData: value.rows,
@@ -275,6 +277,7 @@ app.get('/show-produse', (req, res) => {
 		select().then(function (value) {
 			//console.log(value.rows);
 			res.render('index', {
+				title:"Acasă",
 				username: req.cookies.username,
 				firstname: req.session.firstname,
 				dbData: value.rows,

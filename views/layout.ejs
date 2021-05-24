@@ -2,7 +2,9 @@
 <html lang="ro-RO">
 
 <head>
-    <title>Acasă</title>
+    <title>
+        <%=title%>
+    </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script>
         function openNav() {
@@ -19,11 +21,11 @@
 </head>
 
 <body>
-
-    <header>
-        <h1>Lumea fructelor</h1>
-    </header>
-
+    <div class="header">
+        <header>
+            <h1>Lumea fructelor</h1>
+        </header>
+    </div>
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <nav>
@@ -44,19 +46,20 @@
     <div id="main">
         <% if(username) { %>
             <div class="loggedIN">
-                Logat ca <%= username %>. <button><a href="/delogare">Delogare</a></button>
+                <span>Logat ca <%= username %>.</span><br>
+                <button class="logOutBtn"><span><a href="/delogare">Delogare</a></span></button>
             </div>
-        <% } %>
-        <main id="continut">
-            
-            <%- body -%>
-        </main>
+            <% } %>
+                <main id="continut">
+
+                    <%- body -%>
+                </main>
 
 
-        <hr>
-        <footer>
-            &copy;Dima Raul Andrei. 2021 . Programare web
-        </footer>
+                <hr>
+                <footer>
+                    &copy;Dima Raul Andrei. 2021 . Programare web
+                </footer>
     </div>
 </body>
 
