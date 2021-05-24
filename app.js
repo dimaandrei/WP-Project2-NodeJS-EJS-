@@ -40,7 +40,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
 	//console.log(req.cookies.username);
 	res.render('index', {
-		title:"Acasă",
+		title: "Acasă",
 		username: req.cookies.username,
 		firstname: req.session.firstname,
 		dbData: null,
@@ -165,7 +165,6 @@ async function run() {
 	} catch (err) {
 		console.error(err);
 	}
-	/*
 	finally {
 		if (connection) {
 			try {
@@ -174,7 +173,7 @@ async function run() {
 				console.error(err);
 			}
 		}
-	}*/
+	}
 }
 async function closeConn() {
 	try {
@@ -202,6 +201,7 @@ app.get('/close-conn', (req, res) => {
 async function insert() {
 	try {
 		sql = 'INSERT INTO produse VALUES (:1, :2, :3)';
+		connection = await oracledb.getConnection(dbConfig);
 		binds = [
 			[1, "Castraveti", 4],
 			[2, "Rosii", 13],
@@ -223,6 +223,16 @@ async function insert() {
 	} catch (err) {
 		console.error(err);
 	}
+	finally {
+		if (connection) {
+			try {
+				await connection.close();
+				connection=null;
+			} catch (err) {
+				console.error(err);
+			}
+		}
+	}
 }
 app.get('/inserare-bd', (req, res) => {
 	insert();
@@ -232,7 +242,7 @@ app.get('/inserare-bd', (req, res) => {
 async function select() {
 	try {
 		sql = 'SELECT * FROM produse';
-
+		connection = await oracledb.getConnection(dbConfig);
 		binds = {};
 
 		// For a complete list of options see the documentation.
@@ -254,41 +264,33 @@ async function select() {
 	} catch (err) {
 		console.error(err);
 	}
+	finally {
+		if (connection) {
+			try {
+				await connection.close();
+				connection=null;
+			} catch (err) {
+				console.error(err);
+			}
+		}
+	}
 
 }
 
 app.get('/show-produse', (req, res) => {
-	if (connection == null) {
-		run().then(function () {
-			insert().then(function () {
-				select().then(function (value) {
-					//console.log(value.rows);
-					res.render('index', {
-						title:"Acasă",
-						username: req.cookies.username,
-						firstname: req.session.firstname,
-						dbData: value.rows,
-					});
-				});
-			});
+	select().then(function (value) {
+		//console.log(value.rows);
+		res.render('index', {
+			title: "Acasă",
+			username: req.cookies.username,
+			firstname: req.session.firstname,
+			dbData: value.rows,
 		});
-	}
-	else {
-		select().then(function (value) {
-			//console.log(value.rows);
-			res.render('index', {
-				title:"Acasă",
-				username: req.cookies.username,
-				firstname: req.session.firstname,
-				dbData: value.rows,
-			});
-		});
-	}
+	});
+
 });
 
 app.post('/adaugare-cos', (req, res) => {
-	//var cart = req.session.cart || [];
-	//cart.push(req.body.id);
 	if (!req.session.cart)
 		req.session.cart = []
 	req.session.cart.push(req.body.id);
@@ -297,29 +299,18 @@ app.post('/adaugare-cos', (req, res) => {
 });
 
 app.get('/vizualizare-cos', (req, res) => {
-	if (connection != null) {
-		select().then(function (value) {
-			//console.log(value.rows);
-			res.render('vizualizare-cos', {
-				title: 'Coș cumpărături',
-				username: req.cookies.username,
-				firstname: req.session.firstname,
-				dbData: value.rows,
-				cart: req.session.cart,
-				mesajEroare: null,
-			});
-		});
-	}
-	else {
+	select().then(function (value) {
+		//console.log(value.rows);
 		res.render('vizualizare-cos', {
 			title: 'Coș cumpărături',
 			username: req.cookies.username,
 			firstname: req.session.firstname,
-			dbData: null,
-			cart: null,
-			mesajEroare: "Conexiunea cu baza de date este inchisa!",
+			dbData: value.rows,
+			cart: req.session.cart,
+			mesajEroare: null,
 		});
-	}
+	});
+
 });
 
 app.get('/about', (req, res) => {
@@ -343,8 +334,10 @@ app.get('/admin', (req, res) => {
 		mesajEroare: null,
 	});
 });
+
 async function adminInsert(id, data, pret) {
 	try {
+		connection = await oracledb.getConnection(dbConfig);
 		sql = 'INSERT INTO produse VALUES (:1, :2, :3)';
 		binds = [
 			[parseInt(id), data, parseInt(pret)],
@@ -363,34 +356,28 @@ async function adminInsert(id, data, pret) {
 	} catch (err) {
 		console.error(err);
 	}
+	finally {
+		if (connection) {
+			try {
+				await connection.close();
+				connection=null;
+			} catch (err) {
+				console.error(err);
+			}
+		}
+	}
 }
 
 app.post('/admin-insert', (req, res) => {
-	if (connection != null) {
-		select().then(function (value) {
-			//console.log(value.rows.length);
-			const body = req.body;
-			const keys = Object.keys(body);
-			//console.log(keys);
-			adminInsert(value.rows.length+1,body['data'], body['pret']).then(function(){
-				res.redirect('/admin');
-			});
+	select().then(function (value) {
+		const body = req.body;
+		const keys = Object.keys(body);
+		adminInsert(value.rows.length + 1, body['data'], body['pret']).then(function () {
+			res.redirect('/admin');
 		});
-	}
-	else
-	{
-		res.render('admin', {
-			title: 'Admin',
-			username: req.cookies.username,
-			firstname: req.session.firstname,
-			dbData: null,
-			cart: null,
-			mesajEroare: "Conexiunea cu DB este inchisa.",
-		});
-	}
+	});
 });
 
-//res.send("formular: " + JSON.stringify(req.body));
 
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:6789`));
