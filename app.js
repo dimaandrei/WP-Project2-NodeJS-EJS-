@@ -8,13 +8,19 @@ const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-
+const hashMap = require('hashmap');
 const app = express();
 const port = 6789;
 const fs = require('fs');
 const { Console } = require('console');
 const OracleDB = require('oracledb');
 const { json } = require('body-parser');
+const ipBlock = require('express-ip-block');
+var ips = [];
+const options = { allowForwarded: true };
+
+
+
 // directorul 'views' va conține fișierele .ejs (html + js executat la server)
 app.set('view engine', 'ejs');
 // suport pentru layout-uri - implicit fișierul care reprezintă template-ul site-ului este views/layout.ejs
@@ -28,8 +34,6 @@ app.use(express.static('public'))
 app.use(bodyParser.json());
 // utilizarea unui algoritm de deep parsing care suportă obiecte în obiecte
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
 
 
 // la accesarea din browser adresei http://localhost:6789/ se va returna textul 'Hello World'
@@ -48,7 +52,8 @@ app.get('/', (req, res) => {
 });
 
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
-app.get('/chestionar', (req, res) => {
+app.get('/chestionar',ipBlock(ips, options), (req, res) => {
+	
 	// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
 	fs.readFile('intrebari.json', (err, data) => {
 		if (err) {
@@ -56,12 +61,15 @@ app.get('/chestionar', (req, res) => {
 			return;
 		}
 		res.render('chestionar', {
+			title:"Chestionar",
+			username: req.cookies.username,
+			firstname: req.session.firstname,
 			intrebari: JSON.parse(data)
 		});
 	});
 });
 
-app.post('/rezultat-chestionar', (req, res) => {
+app.post('/rezultat-chestionar',ipBlock(ips, options), (req, res) => {
 	fs.readFile('intrebari.json', (err, data) => {
 		if (err) {
 			res.send('Nu exista intrebari!');
@@ -78,6 +86,9 @@ app.post('/rezultat-chestionar', (req, res) => {
 				raspCor++;
 		}
 		res.render('rezultat-chestionar', {
+			title:"Chestionar",
+			username: req.cookies.username,
+			firstname: req.session.firstname,
 			intrebari: listaIntrebari,
 			raspunsuri_corecte: raspCor
 		});
@@ -85,7 +96,7 @@ app.post('/rezultat-chestionar', (req, res) => {
 });
 
 
-app.get('/autentificare', (req, res) => {
+app.get('/autentificare',ipBlock(ips, options), (req, res) => {
 	res.render('autentificare', {
 		title: 'Autentificare',
 		username: req.cookies.username,
@@ -93,7 +104,7 @@ app.get('/autentificare', (req, res) => {
 	});
 });
 
-app.post('/verificare-autentificare', (req, res) => {
+app.post('/verificare-autentificare',ipBlock(ips, options), (req, res) => {
 	/*console.log(req.body);
 	if (req.body.username === "test" && req.body.password === "test") {
 		console.log("Corect");
@@ -111,7 +122,7 @@ app.post('/verificare-autentificare', (req, res) => {
 
 		res.redirect('/autentificare');
 	}*/
-	fs.readFile('utilizatori2.json', (err, data) => {
+	fs.readFile('utilizatori2.json',ipBlock(ips, options), (err, data) => {
 		if (err) {
 			res.status(404);
 			res.send('Eroare! File not found!');
@@ -139,7 +150,7 @@ app.post('/verificare-autentificare', (req, res) => {
 
 });
 
-app.get('/delogare', (req, res) => {
+app.get('/delogare',ipBlock(ips, options), (req, res) => {
 	res.clearCookie('username');
 	res.redirect('/autentificare');
 });
@@ -189,12 +200,12 @@ async function closeConn() {
 		console.error(err);
 	}
 }
-app.get('/creare-bd', (req, res) => {
+app.get('/creare-bd',ipBlock(ips, options), (req, res) => {
 	run();
 	res.redirect('/');
 });
 
-app.get('/close-conn', (req, res) => {
+app.get('/close-conn',ipBlock(ips, options), (req, res) => {
 	closeConn();
 	res.redirect('/');
 });
@@ -227,14 +238,14 @@ async function insert() {
 		if (connection) {
 			try {
 				await connection.close();
-				connection=null;
+				connection = null;
 			} catch (err) {
 				console.error(err);
 			}
 		}
 	}
 }
-app.get('/inserare-bd', (req, res) => {
+app.get('/inserare-bd',ipBlock(ips, options), (req, res) => {
 	insert();
 	res.redirect('/');
 });
@@ -268,7 +279,7 @@ async function select() {
 		if (connection) {
 			try {
 				await connection.close();
-				connection=null;
+				connection = null;
 			} catch (err) {
 				console.error(err);
 			}
@@ -277,7 +288,7 @@ async function select() {
 
 }
 
-app.get('/show-produse', (req, res) => {
+app.get('/show-produse',ipBlock(ips, options), (req, res) => {
 	select().then(function (value) {
 		//console.log(value.rows);
 		res.render('index', {
@@ -290,7 +301,7 @@ app.get('/show-produse', (req, res) => {
 
 });
 
-app.post('/adaugare-cos', (req, res) => {
+app.post('/adaugare-cos',ipBlock(ips, options), (req, res) => {
 	if (!req.session.cart)
 		req.session.cart = []
 	req.session.cart.push(req.body.id);
@@ -298,7 +309,7 @@ app.post('/adaugare-cos', (req, res) => {
 	res.redirect('/show-produse');
 });
 
-app.get('/vizualizare-cos', (req, res) => {
+app.get('/vizualizare-cos',ipBlock(ips, options), (req, res) => {
 	select().then(function (value) {
 		//console.log(value.rows);
 		res.render('vizualizare-cos', {
@@ -313,7 +324,7 @@ app.get('/vizualizare-cos', (req, res) => {
 
 });
 
-app.get('/about', (req, res) => {
+app.get('/about',ipBlock(ips, options), (req, res) => {
 	res.render('about', {
 		title: 'About',
 		username: req.cookies.username,
@@ -324,7 +335,7 @@ app.get('/about', (req, res) => {
 	});
 });
 
-app.get('/admin', (req, res) => {
+app.get('/admin',ipBlock(ips, options), (req, res) => {
 	res.render('admin', {
 		title: 'Admin',
 		username: req.cookies.username,
@@ -360,7 +371,7 @@ async function adminInsert(id, data, pret) {
 		if (connection) {
 			try {
 				await connection.close();
-				connection=null;
+				connection = null;
 			} catch (err) {
 				console.error(err);
 			}
@@ -368,7 +379,7 @@ async function adminInsert(id, data, pret) {
 	}
 }
 
-app.post('/admin-insert', (req, res) => {
+app.post('/admin-insert',ipBlock(ips, options), (req, res) => {
 	select().then(function (value) {
 		const body = req.body;
 		const keys = Object.keys(body);
@@ -377,8 +388,31 @@ app.post('/admin-insert', (req, res) => {
 		});
 	});
 });
+var hMap = new hashMap();
+app.get('*',ipBlock(ips, options), (req, res) => {
+	//console.log(attempts);
+	const parsedIp =
+		req.headers['x-forwarded-for']?.split(',').shift()
+		|| req.socket?.remoteAddress
 
+	console.log(parsedIp);
 
+	if (!hMap.has(parparsedIpseIp)) {
+		hMap.set(parsedIp, 1);
+	}
+	else {
+		hMap.set(parsedIp, hMap.get(parsedIp) + 1);
+		if (hMap.get(parsedIp) === 3) {
+			console.log("Client blocat");
+			ips.push(parsedIp);
+			hMap.delete(parsedIp);
+		}
+	}
 
+	console.log(hMap.get(parsedIp));
+	return res.status(404).send({
+		message: 'Route' + req.url + ' Not found.'
+	});
+});
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:6789`));
 
