@@ -17,7 +17,7 @@ const OracleDB = require('oracledb');
 const { json } = require('body-parser');
 const ipBlock = require('express-ip-block');
 var ips = [];
-const options = { allowForwarded: true };
+const options2 = { allowForwarded: true };
 
 
 
@@ -52,7 +52,7 @@ app.get('/', (req, res) => {
 });
 
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
-app.get('/chestionar',ipBlock(ips, options), (req, res) => {
+app.get('/chestionar',ipBlock(ips, options2), (req, res) => {
 	
 	// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
 	fs.readFile('intrebari.json', (err, data) => {
@@ -69,7 +69,7 @@ app.get('/chestionar',ipBlock(ips, options), (req, res) => {
 	});
 });
 
-app.post('/rezultat-chestionar',ipBlock(ips, options), (req, res) => {
+app.post('/rezultat-chestionar',ipBlock(ips, options2), (req, res) => {
 	fs.readFile('intrebari.json', (err, data) => {
 		if (err) {
 			res.send('Nu exista intrebari!');
@@ -96,7 +96,7 @@ app.post('/rezultat-chestionar',ipBlock(ips, options), (req, res) => {
 });
 
 
-app.get('/autentificare',ipBlock(ips, options), (req, res) => {
+app.get('/autentificare',ipBlock(ips, options2), (req, res) => {
 	res.render('autentificare', {
 		title: 'Autentificare',
 		username: req.cookies.username,
@@ -104,7 +104,7 @@ app.get('/autentificare',ipBlock(ips, options), (req, res) => {
 	});
 });
 
-app.post('/verificare-autentificare',ipBlock(ips, options), (req, res) => {
+app.post('/verificare-autentificare',ipBlock(ips, options2), (req, res) => {
 	/*console.log(req.body);
 	if (req.body.username === "test" && req.body.password === "test") {
 		console.log("Corect");
@@ -122,7 +122,7 @@ app.post('/verificare-autentificare',ipBlock(ips, options), (req, res) => {
 
 		res.redirect('/autentificare');
 	}*/
-	fs.readFile('utilizatori2.json',ipBlock(ips, options), (err, data) => {
+	fs.readFile('utilizatori2.json', (err, data) => {
 		if (err) {
 			res.status(404);
 			res.send('Eroare! File not found!');
@@ -150,7 +150,7 @@ app.post('/verificare-autentificare',ipBlock(ips, options), (req, res) => {
 
 });
 
-app.get('/delogare',ipBlock(ips, options), (req, res) => {
+app.get('/delogare',ipBlock(ips, options2), (req, res) => {
 	res.clearCookie('username');
 	res.redirect('/autentificare');
 });
@@ -200,12 +200,12 @@ async function closeConn() {
 		console.error(err);
 	}
 }
-app.get('/creare-bd',ipBlock(ips, options), (req, res) => {
+app.get('/creare-bd',ipBlock(ips, options2), (req, res) => {
 	run();
 	res.redirect('/');
 });
 
-app.get('/close-conn',ipBlock(ips, options), (req, res) => {
+app.get('/close-conn',ipBlock(ips, options2), (req, res) => {
 	closeConn();
 	res.redirect('/');
 });
@@ -245,7 +245,7 @@ async function insert() {
 		}
 	}
 }
-app.get('/inserare-bd',ipBlock(ips, options), (req, res) => {
+app.get('/inserare-bd',ipBlock(ips, options2), (req, res) => {
 	insert();
 	res.redirect('/');
 });
@@ -288,7 +288,7 @@ async function select() {
 
 }
 
-app.get('/show-produse',ipBlock(ips, options), (req, res) => {
+app.get('/show-produse',ipBlock(ips, options2), (req, res) => {
 	select().then(function (value) {
 		//console.log(value.rows);
 		res.render('index', {
@@ -301,7 +301,7 @@ app.get('/show-produse',ipBlock(ips, options), (req, res) => {
 
 });
 
-app.post('/adaugare-cos',ipBlock(ips, options), (req, res) => {
+app.post('/adaugare-cos',ipBlock(ips, options2), (req, res) => {
 	if (!req.session.cart)
 		req.session.cart = []
 	req.session.cart.push(req.body.id);
@@ -309,7 +309,7 @@ app.post('/adaugare-cos',ipBlock(ips, options), (req, res) => {
 	res.redirect('/show-produse');
 });
 
-app.get('/vizualizare-cos',ipBlock(ips, options), (req, res) => {
+app.get('/vizualizare-cos',ipBlock(ips, options2), (req, res) => {
 	select().then(function (value) {
 		//console.log(value.rows);
 		res.render('vizualizare-cos', {
@@ -324,7 +324,7 @@ app.get('/vizualizare-cos',ipBlock(ips, options), (req, res) => {
 
 });
 
-app.get('/about',ipBlock(ips, options), (req, res) => {
+app.get('/about',ipBlock(ips, options2), (req, res) => {
 	res.render('about', {
 		title: 'About',
 		username: req.cookies.username,
@@ -335,7 +335,7 @@ app.get('/about',ipBlock(ips, options), (req, res) => {
 	});
 });
 
-app.get('/admin',ipBlock(ips, options), (req, res) => {
+app.get('/admin',ipBlock(ips, options2), (req, res) => {
 	res.render('admin', {
 		title: 'Admin',
 		username: req.cookies.username,
@@ -379,7 +379,7 @@ async function adminInsert(id, data, pret) {
 	}
 }
 
-app.post('/admin-insert',ipBlock(ips, options), (req, res) => {
+app.post('/admin-insert',ipBlock(ips, options2), (req, res) => {
 	select().then(function (value) {
 		const body = req.body;
 		const keys = Object.keys(body);
@@ -389,7 +389,7 @@ app.post('/admin-insert',ipBlock(ips, options), (req, res) => {
 	});
 });
 var hMap = new hashMap();
-app.get('*',ipBlock(ips, options), (req, res) => {
+app.get('*',ipBlock(ips, options2), (req, res) => {
 	//console.log(attempts);
 	const parsedIp =
 		req.headers['x-forwarded-for']?.split(',').shift()
@@ -404,7 +404,7 @@ app.get('*',ipBlock(ips, options), (req, res) => {
 		hMap.set(parsedIp, hMap.get(parsedIp) + 1);
 		if (hMap.get(parsedIp) === 3) {
 			console.log("Client blocat");
-			ips.push(parsedIp);
+			ips.push(parsedIp); 
 			hMap.delete(parsedIp);
 		}
 	}
