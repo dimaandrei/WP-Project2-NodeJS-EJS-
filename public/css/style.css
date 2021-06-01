@@ -1,0 +1,262 @@
+body {
+    background-color: rgb(107, 130, 151);
+    background-image: url("../imagini/1948221.png");
+    background-size: cover;
+    background-repeat: repeat;
+    background-position: center center;
+}
+
+body {
+    font-family: "Lato", sans-serif;
+}
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+#main {
+    transition: margin-left .5s;
+    padding: 16px;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {
+        padding-top: 15px;
+    }
+    .sidenav a {
+        font-size: 18px;
+    }
+}
+
+header {
+    text-align: center;
+}
+
+.autentificare p {
+    color: crimson;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+td  :last-child {
+    border: none;
+    
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.center thead tr {
+    background-color: #009879;
+    color: #ffffff;
+    text-align: left;
+}
+
+.center th,
+.center td {
+    padding: 12px 15px;
+}
+
+.center tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.center tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.center tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+
+.center tbody tr.active-row {
+    font-weight: bold;
+    color: #009879;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(39, 153, 64);
+    color: white;
+    text-align: center;
+    
+}
+
+.header {
+    height: 102px;
+    background: rgb(51, 145, 72);
+    padding: 10px;
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.header h1 {
+    color: antiquewhite;
+    text-align: center;
+}
+.autentBoxes{
+    text-align: center;
+    top:30%;
+    position: absolute;
+    left: 47%;
+    -ms-transform: translateX(-30%);
+    transform: translateX(-30%);
+}
+
+.about{
+    text-align: center;
+}
+
+.mainLinks{
+    text-align: center;
+    top:15%;
+    position: absolute;
+    left: 47%;
+    -ms-transform: translateX(-30%);
+    transform: translateX(-30%);
+}
+
+.mainContent{
+    margin-top: 100px;
+}
+
+.errMsjAuth{
+    text-align: center;
+    top:50%;
+    position: absolute;
+    left: 47%;
+    -ms-transform: translateX(-30%);
+    transform: translateX(-30%);
+}
+.loggedIN{
+    text-align: center;
+    top:5%;
+    position: absolute;
+    left: 90%;
+    -ms-transform: translateX(-30%);
+    transform: translateX(-30%);
+}
+.btn {
+    margin: 0;
+    position: absolute;
+
+    left: 47.5%;
+    -ms-transform: translateX(-30%);
+    transform: translateX(-30%);
+    top:40%;
+    border-radius: 4px;
+    background-color: #4cb2b9;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 17px;
+    padding: 20px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    
+}
+.logOutBtn {
+    margin: 0;
+    border-radius: 4px;
+    background-color: #cfe034;
+    border: none;
+    color:  #2e2a27;
+    text-align: center;
+    font-size: 17px;
+    padding: 20px;
+    width: 150px;
+    height: 15px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    
+}
+
+.btn span{
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    padding-top: -30px;
+    transition: 0.5s;
+    
+}
+.logOutBtn span a{
+    text-decoration: none;
+    color: #2e2a27;
+}
+
+.logOutBtn span{
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    padding-top: -20px;
+    transition: 0.5s;
+    top:-10px;
+    
+}
+
+
+.btn span:after,.logOutBtn span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+
+.btn:hover span,.logOutBtn:hover span {
+    padding-right: 25px;
+}
+
+.btn:hover span:after, .logOutBtn:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+
+

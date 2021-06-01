@@ -1,0 +1,37 @@
+[
+    {
+        "intrebare":"1.Va plac fructele?",
+        "variante": ["Da", "Nu", "Ce sunt alea?", "Carnea e baza!"],
+        "corect": 0
+    },
+    {
+        "intrebare": "2.Rosiile sunt fructe?",
+        "variante": ["Da", "Nu", "Poate", "Nu stiu!"],
+        "corect": 0
+    },
+    {
+        "intrebare": "3.Bananele sunt radioactive?",
+        "variante": ["Da", "Nu", "Nu sunt documentat suficient!", "Imposibil!"],
+        "corect": 0
+    },
+    {
+        "intrebare": "4.Castravetii sunt fructe sau legume?",
+        "variante": ["Legume", "Fructe", "Nu cunosc."],
+        "corect": 1
+    },
+    {
+        "intrebare": "5.Cine sunt mai bogate in vitamina C, capsunile sau portocalele?",
+        "variante": ["Banananele", "Portocalelel","Capsunile", "Nu cunosc."],
+        "corect": 2
+    },
+    {
+        "intrebare": "6.Care e cel mai consumat fruct din Europa?",
+        "variante": ["Rosia", "Banana", "Para", "Marul", "Castravetele", "Nu stiu!"],
+        "corect": 3
+    },
+    {
+        "intrebare": "7.Care e primul fruct plantat de om?",
+        "variante": ["Rosia", "Banana", "Para", "Marul", "Castravetele", "Nu stiu!"],
+        "corect": 1
+    }
+]

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ro-RO">
+
+<head>
+    <title>
+        <%=title%>
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+            document.getElementById("main").style.marginLeft = "250px";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+            document.getElementById("main").style.marginLeft = "0";
+        }
+    </script>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+
+<body>
+    <div class="header">
+        <header>
+            <h1>Lumea fructelor</h1>
+        </header>
+    </div>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <nav>
+            <hr>
+            <a href="/">Acasă</a>
+            <a href="/autentificare">Autentificare</a>
+            <a href="/chestionar">Chestionar</a>
+            <a href="/vizualizare-cos">Coș cumpărături</a>
+            <a href="/creare-bd">Creare DB</a>
+            <a href="/inserare-bd">Inserare DB</a>
+            <a href="/close-conn">Close DB</a>
+            <a href="/about">About</a>
+            <hr>
+        </nav>
+    </div>
+    <aside>
+        <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+    </aside>
+    <div id="main">
+        <% if(username) { %>
+            <div class="loggedIN">
+                <span>Logat ca <%= username %>.</span><br>
+                <button class="logOutBtn"><span><a href="/delogare">Delogare</a></span></button>
+            </div>
+            <% } %>
+                <main id="continut">
+
+                    <%- body -%>
+                </main>
+
+
+                <hr>
+                <footer>
+                    &copy;Dima Raul Andrei. 2021 . Programare web
+                </footer>
+    </div>
+</body>
+
+</html>
